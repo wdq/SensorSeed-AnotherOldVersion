@@ -26,5 +26,9 @@ namespace SensorSeed.Controllers
 
             return View();
         }
+        public ActionResult HomeOutsideWeatherStation()
+        {
+            return View();
+        }
     }
 }

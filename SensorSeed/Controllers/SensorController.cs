@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
 
 namespace SensorSeed.Controllers
 {
@@ -12,6 +14,45 @@ namespace SensorSeed.Controllers
         public ActionResult Index()
         {
             return View();
+        }
+
+        [HttpGet]
+        public ActionResult GetHomeOutsideWeatherStationData()
+        {
+            SensorSeedDataContext database = new SensorSeedDataContext();
+            BsonArray outputJson = new BsonArray();
+            var datas = database.HomeOutsideWeatherStationDatas.Where(x => x.Timestamp != null).OrderByDescending(x => x.Timestamp);
+            foreach(var data in datas)
+            {
+                BsonDocument document = new BsonDocument
+                {
+                    { "Id", data.Id.ToString() },
+                    { "Timestamp", data.Timestamp.ToLocalTime().ToString() },
+                    { "Temperature", data.Temperature.ToString() },
+                    { "Humidity", data.Humidity.ToString() },
+                    { "Pressure", data.Pressure.ToString() },
+                    { "Altitude", data.Altitude.ToString() },
+                    { "WindSpeed", data.WindSpeed.ToString() },
+                    { "GustSpeed", data.GustSpeed.ToString() },
+                    { "Rain", data.Rain.ToString() },
+                    { "Battery", data.Battery.ToString() },
+                    { "Solar", data.Solar.ToString() },
+                    { "WindDirection", data.WindDirection.ToString() }
+                };
+                outputJson.Add(document);
+
+            }
+
+            var s = outputJson.ToJson(new JsonWriterSettings()
+            {
+                OutputMode = JsonOutputMode.Shell
+            });
+
+            return new ContentResult()
+            {
+                Content = s,
+                ContentType = "text/json"
+            };
         }
 
         [HttpPost]

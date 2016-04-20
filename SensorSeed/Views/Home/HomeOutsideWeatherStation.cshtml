@@ -1,0 +1,269 @@
+﻿@{
+    ViewBag.Title = "Home Outside Weather Station";
+}
+
+<style>
+    path {
+        stroke: steelblue;
+        stroke-width: 2;
+        fill: none;
+    }
+
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1;
+        shape-rendering: crispEdges;
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <br />
+            <br />
+            <div id="chart"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    // Set the dimensions of the canvas / graph
+    var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+            width = 1170 - margin.left - margin.right,
+            height = 700 - margin.top - margin.bottom;
+
+    // Parse the date / time
+    var parseDate = d3.time.format("%m/%d/%Y %I:%M:%S %p").parse;
+
+    // Set the ranges
+    var x = d3.time.scale().range([0, width]);
+    var y = d3.scale.linear().range([height, 0]);
+
+    // Define the axes
+    var xAxis = d3.svg.axis().scale(x)
+        .orient("bottom").ticks(5);
+
+    var yAxis = d3.svg.axis().scale(y)
+        .orient("left").ticks(5);
+
+    // Define the line
+    var valueline = d3.svg.line()
+        .x(function (d) { return x(d.Timestamp); })
+        .y(function (d) { return y(d.Temperature); });
+
+    // Adds the svg canvas
+    var svg = d3.select("#chart")
+        .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform",
+                  "translate(" + margin.left + "," + margin.top + ")");
+
+    // Get the data
+    d3.json("/SensorSeed/Sensor/GetHomeOutsideWeatherStationData", function (error, json) {
+        var data;
+        data = json;
+        data.forEach(function (d) {
+            d.Timestamp = parseDate(d.Timestamp);
+        });
+        console.log(data);
+    //d3.csv("data.csv", function (error, data) {
+    //    data.forEach(function (d) {
+    //        d.date = parseDate(d.date);
+    //        d.close = +d.close;
+    //    });
+
+        // Scale the range of the data
+        x.domain(d3.extent(data, function (d) { return d.Timestamp; }));
+        y.domain([0, d3.max(data, function (d) { return d.Temperature; })]);
+
+        // Add the valueline path.
+        svg.append("path")
+            .attr("class", "line")
+            .attr("d", valueline(data));
+
+        // Add the X Axis
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        // Add the Y Axis
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+    });
+    /*
+        // Set the dimensions of the canvas / graph
+        var margin = {top: 30, right: 20, bottom: 30, left: 50},
+                width = 1170 - margin.left - margin.right,
+                height = 700 - margin.top - margin.bottom;
+
+        // Parse the date / time
+        var parseDate = d3.time.format("%a %Y-%m-%d %H:%M:%S GMT").parse;
+
+        // Set the ranges
+        var x = d3.time.scale().range([0, width]);
+        var y = d3.scale.linear().range([height, 0]);
+
+        // Define the axes
+        var xAxis = d3.svg.axis().scale(x)
+                .orient("bottom").ticks(5);
+
+        var yAxis = d3.svg.axis().scale(y)
+                .orient("left").ticks(5);
+
+        // Define the line
+        var valueline = d3.svg.line()
+                .x(function(d) { return x(d.Timestamp); })
+                .y(function(d) { return y(d.Temperature); });
+
+        // Adds the svg canvas
+        var svg = d3.select("#chart")
+                .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                        .attr("transform",
+                                  "translate(" + margin.left + "," + margin.top + ")");
+
+    // Get the data          
+
+        //d3.text("./logs/log", function(text) {
+        //        data = d3.csv.parseRows(text);
+        //        console.log(data);
+        //        data.forEach(function(d) {
+        //                d[0] = parseDate(d[0]);
+        //                d[2] = +d[2];
+        //        }); 
+        d3.json("/SensorSeed/Sensor/GetHomeOutsideWeatherStationData", function (error, json) {
+            var data;
+            data = json;
+            console.log(data);
+            // Scale the range of the data
+            x.domain(d3.extent(data, function (d) {
+                return d.Timestamp;
+            }));
+            y.domain([0, d3.max(data, function (d) { return d.Temperature })]);
+
+            // Add the valueline path.
+            svg.append("path")
+                    .attr("class", "line")
+                    .attr("d", valueline(data));
+
+            // Add the X Axis
+            svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+            // Add the Y Axis
+            svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis);
+        });
+ 
+
+        //});
+        
+ /*   var margin = { top: 20, right: 20, bottom: 30, left: 40 },
+        width = 960 - margin.left - margin.right,
+        height = 500 - margin.top - margin.bottom;
+
+    var x = d3.scale.linear()
+        .range([0, width]);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var color = d3.scale.category10();
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left");
+
+    var svg = d3.select("#chart").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.json("./SensorSeed/Sensor/GetHomeOutsideWeatherStationData", function (error, json) {
+        data = json;
+    });
+    //d3.tsv("data.tsv", function (error, data) {
+    //    if (error) throw error;
+//
+//        data.forEach(function (d) {
+ //           d.sepalLength = +d.sepalLength;
+  //          d.sepalWidth = +d.sepalWidth;
+   //     });
+
+        x.domain(d3.extent(data, function (d) { return d.sepalWidth; })).nice();
+        y.domain(d3.extent(data, function (d) { return d.sepalLength; })).nice();
+
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+          .append("text")
+            .attr("class", "label")
+            .attr("x", width)
+            .attr("y", -6)
+            .style("text-anchor", "end")
+            .text("Sepal Width (cm)");
+
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+          .append("text")
+            .attr("class", "label")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Sepal Length (cm)")
+
+        svg.selectAll(".dot")
+            .data(data)
+          .enter().append("circle")
+            .attr("class", "dot")
+            .attr("r", 3.5)
+            .attr("cx", function (d) { return x(d.sepalWidth); })
+            .attr("cy", function (d) { return y(d.sepalLength); })
+            .style("fill", function (d) { return color(d.species); });
+
+        var legend = svg.selectAll(".legend")
+            .data(color.domain())
+          .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
+
+        legend.append("rect")
+            .attr("x", width - 18)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", color);
+
+        legend.append("text")
+            .attr("x", width - 24)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .style("text-anchor", "end")
+            .text(function (d) { return d; });
+
+    //});
+    */
+</script>
+
+
+
