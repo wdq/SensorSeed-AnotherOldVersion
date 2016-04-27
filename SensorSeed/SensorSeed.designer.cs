@@ -605,6 +605,8 @@ namespace SensorSeed
 		
 		private System.Nullable<decimal> _WindDirection;
 		
+		private System.Nullable<decimal> _Temperature180;
+		
     #region Extensibility Method Definitions
     partial void OnLoaded();
     partial void OnValidate(System.Data.Linq.ChangeAction action);
@@ -633,6 +635,8 @@ namespace SensorSeed
     partial void OnSolarChanged();
     partial void OnWindDirectionChanging(System.Nullable<decimal> value);
     partial void OnWindDirectionChanged();
+    partial void OnTemperature180Changing(System.Nullable<decimal> value);
+    partial void OnTemperature180Changed();
     #endregion
 		
 		public HomeOutsideWeatherStationData()
@@ -876,6 +880,26 @@ namespace SensorSeed
 					this._WindDirection = value;
 					this.SendPropertyChanged("WindDirection");
 					this.OnWindDirectionChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_Temperature180", DbType="Decimal(6,2)")]
+		public System.Nullable<decimal> Temperature180
+		{
+			get
+			{
+				return this._Temperature180;
+			}
+			set
+			{
+				if ((this._Temperature180 != value))
+				{
+					this.OnTemperature180Changing(value);
+					this.SendPropertyChanging();
+					this._Temperature180 = value;
+					this.SendPropertyChanged("Temperature180");
+					this.OnTemperature180Changed();
 				}
 			}
 		}

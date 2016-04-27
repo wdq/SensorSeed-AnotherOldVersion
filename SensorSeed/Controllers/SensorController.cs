@@ -17,17 +17,20 @@ namespace SensorSeed.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetHomeOutsideWeatherStationData()
+        public ActionResult GetHomeOutsideWeatherStationData(string StartDateTime, string EndDateTime)
         {
+            DateTime startDateTime = DateTime.Parse(StartDateTime);
+            DateTime endDateTime = DateTime.Parse(EndDateTime);
+
             SensorSeedDataContext database = new SensorSeedDataContext();
             BsonArray outputJson = new BsonArray();
-            var datas = database.HomeOutsideWeatherStationDatas.Where(x => x.Timestamp != null).OrderByDescending(x => x.Timestamp);
+            var datas = database.HomeOutsideWeatherStationDatas.Where(x => x.Timestamp > startDateTime && x.Timestamp < endDateTime).OrderByDescending(x => x.Timestamp);
             foreach(var data in datas)
             {
                 BsonDocument document = new BsonDocument
                 {
                     { "Id", data.Id.ToString() },
-                    { "Timestamp", data.Timestamp.ToLocalTime().ToString() },
+                    { "Timestamp", data.Timestamp.ToString() },
                     { "Temperature", data.Temperature.ToString() },
                     { "Humidity", data.Humidity.ToString() },
                     { "Pressure", data.Pressure.ToString() },
@@ -37,7 +40,9 @@ namespace SensorSeed.Controllers
                     { "Rain", data.Rain.ToString() },
                     { "Battery", data.Battery.ToString() },
                     { "Solar", data.Solar.ToString() },
-                    { "WindDirection", data.WindDirection.ToString() }
+                    { "WindDirection", data.WindDirection.ToString() },
+                    { "Temperature180", data.Temperature180.ToString() }
+
                 };
                 outputJson.Add(document);
 
@@ -55,8 +60,38 @@ namespace SensorSeed.Controllers
             };
         }
 
+        [HttpGet]
+        public ActionResult GetHomeOutsideWeatherStationRainTotals(string StartDateTime, string EndDateTime)
+        {
+            DateTime startDateTime = DateTime.Parse(StartDateTime);
+            DateTime endDateTime = DateTime.Parse(EndDateTime);
+
+            SensorSeedDataContext database = new SensorSeedDataContext();
+            BsonArray outputJson = new BsonArray();
+            var datas = database.HomeOutsideWeatherStationDatas.Where(x => x.Timestamp > startDateTime && x.Timestamp < endDateTime && x.Rain != 0).OrderByDescending(x => x.Timestamp);
+            decimal? sum = datas.Sum(x => x.Rain);
+            BsonDocument document = new BsonDocument
+            {
+                { "Sum", sum.ToString() }
+            };
+            outputJson.Add(document);
+
+
+            var s = outputJson.ToJson(new JsonWriterSettings()
+            {
+                OutputMode = JsonOutputMode.Shell
+            });
+
+            return new ContentResult()
+            {
+                Content = s,
+                ContentType = "text/json"
+            };
+        }
+
+
         [HttpPost]
-        public ActionResult AddHomeOutsideWeatherStationData(string Temperature, string Humidity, string Pressure, string Altitude, string Wind, string Gust, string Rain, string Battery, string Solar, string Direction)
+        public ActionResult AddHomeOutsideWeatherStationData(string Temperature, string Humidity, string Pressure, string Altitude, string Wind, string Gust, string Rain, string Battery, string Solar, string Direction, string Temperature180)
         {
             SensorSeedDataContext database = new SensorSeedDataContext();
 
@@ -110,7 +145,13 @@ namespace SensorSeed.Controllers
             catch (Exception exception) { }
 
             // GustSpeed
-
+            try
+            {
+                decimal GustSpeedDecimal = 0;
+                GustSpeedDecimal = Convert.ToDecimal(Gust);
+                data.GustSpeed = GustSpeedDecimal;
+            }
+            catch (Exception exception) { }
 
             // Rain
             try
@@ -226,6 +267,15 @@ namespace SensorSeed.Controllers
             catch (Exception exception) {
                 int a = 1;
             }
+
+            // Temperature180
+            try
+            {
+                decimal TemperatureDecimal = 0;
+                TemperatureDecimal = Convert.ToDecimal(Temperature180);
+                data.Temperature180 = TemperatureDecimal;
+            }
+            catch (Exception exception) { }
 
 
 
