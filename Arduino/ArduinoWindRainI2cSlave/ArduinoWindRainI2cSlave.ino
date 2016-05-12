@@ -22,6 +22,7 @@ volatile unsigned long rain_last=0;
 double dataToSend;
 
 unsigned long previousMillis = millis();
+unsigned long previousWindSpeedRetrieveMillis = millis();
 long interval = 600000; // interval at which to do something (milliseconds)
 
  
@@ -42,9 +43,12 @@ void setupWeatherInts()
 
 double getUnitWind()
 {
+  unsigned long currentWindSpeedRetrieveMillis = millis();
+  unsigned long windSpeedRetrieveMillisDifference =   currentWindSpeedRetrieveMillis - previousWindSpeedRetrieveMillis;
+  previousWindSpeedRetrieveMillis = millis();
   unsigned long reading=anem_count; // get the raw counter value
   anem_count=0; // clear it
-  double returnValue = (WIND_FACTOR*reading)/(TEST_PAUSE/1000); 
+  double returnValue = (WIND_FACTOR*reading)/(windSpeedRetrieveMillisDifference/1000); 
   /*
    * (2.4 * counter)
    * / 60000/ 1000 (or 60)

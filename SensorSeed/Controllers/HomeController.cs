@@ -10,7 +10,7 @@ namespace SensorSeed.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("HomeOutsideWeatherStation", "Home"); ;
         }
 
         public ActionResult About()

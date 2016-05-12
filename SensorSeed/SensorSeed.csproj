@@ -213,6 +213,9 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\d3.js" />
     <Content Include="Content\d3.min.js" />
+    <Content Include="Content\HomeOutsideWeatherStationWeek.js" />
+    <Content Include="Content\HomeOutsideWeatherStationDay.js" />
+    <Content Include="Content\HomeOutsideWeatherStationHour.js" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
