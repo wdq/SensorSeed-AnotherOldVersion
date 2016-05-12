@@ -157,12 +157,12 @@ d3.json("/SensorSeed/Sensor/GetHomeOutsideWeatherStationData?StartDateTime=" + d
     temperatureY.domain([-20, 40]);
     humidityY.domain([0, 105]);
     pressureY.domain([950, 1000]);
-    windSpeedY.domain([0, 100]);
+    windSpeedY.domain([0, 30]);
     windGustY.domain([0, 100]);
     windDirectionY.domain([0, 370]);
     rainY.domain([0, 3]);
-    batteryY.domain([3, 5]);
-    solarY.domain([0, 11]);
+    batteryY.domain([3, 4.5]);
+    solarY.domain([0, 6]);
 
     //y.domain(d3.extent(data, function (d) { return d.Temperature; }));
 
